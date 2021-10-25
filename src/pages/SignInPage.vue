@@ -5,15 +5,15 @@
         <div class="col-sm-8 col-md-10 col-lg-4 mx-auto">
           <div class="card text-center mx-auto">
             <div class="card-body">
-              <h5 class="card-title">Для использования приложения, необходимо авторизоваться</h5>
-              <button 
-                type="button" 
+              <h5 class="card-title">Чтобы использовать приложение, необходимо авторизоваться</h5>
+              <a 
+                href="https://github.com/login/oauth/authorize?client_id=75691eac3da77485bbef&redirect_uri=http://localhost:3000/auth/callback?path=/&scope=user:email"
                 class="btn btn_sign_in"
-                @click="signIn('github')"
               >
                 SignIn with GitHub
                 <font-awesome-icon :icon="['fab', 'github']" size="lg" />
-              </button>
+              </a>
+              
             </div>
           </div>
         </div>
@@ -23,8 +23,6 @@
 </template>
 
 <script>
-// import axios from 'axios'
-
 export default {
   name: 'SignIn',
   props: {
@@ -36,33 +34,9 @@ export default {
     }
   },
   methods: {
-    logIn() {
-      console.log('logIn()')
-      // this.$emit('logIn')
-    },
     redirectToMain() {
       window.location = 'http://localhost:8080/';
-    },
-    signIn(provider) {
-      this.$auth.authenticate(provider).then((response) => {
-        console.log(response.data)
-      })
-    },
-    // signIn(provider) {
-    //   let self = this;
-    //   this.$auth.authenticate(provider).then(function() {
-    //     let token = self.$auth.getToken();
-    //     self.$axios
-    //       .get("auth/github", {
-    //         params: { token: token, driver: provider }
-    //       })
-    //       .then(function(response) {
-    //         this.$router.push({ name: 'main' });
-    //         self.$root.closeDrawer();
-    //         self.$root.signin(response.data);
-    //       });
-    //   })
-    // },
+    }
   }
 }
 </script>

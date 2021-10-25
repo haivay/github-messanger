@@ -17,10 +17,5 @@ export default new VueRouter({
       name: 'signIn',
       component: SignInPage
     },
-    {
-      path: '/auth/github',
-      name: 'main',
-      component: MainPage
-    },
   ]
 })

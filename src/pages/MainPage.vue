@@ -1,7 +1,9 @@
 <template>
   <div class="main">
     <div class="header mb-3">
-      <Header />
+      <Header 
+        :user="user"
+      />
     </div>
     <div class="container">
       <div class="row">
@@ -10,7 +12,12 @@
         </div>
         <div class="col-sm-0 col-md-7 col-lg-8">
           <div class="messages">
-            messages
+            
+            <a 
+              href="#"
+            >
+              {{ user }}
+            </a>
           </div>
         </div>
       </div>
@@ -21,6 +28,7 @@
 <script>
 import Header from '../components/Header.vue'
 import ContactList from '../components/ContactList.vue'
+import axios from 'axios'
 
 export default {
   name: 'MainPage',
@@ -30,9 +38,21 @@ export default {
   },
   data() {
     return {
-      user: {
-        name: 'haivay'
-      },
+      user: null
+    }
+  },
+  async created() {
+    if (!this.user) {
+      await this.getUserData()
+      console.log(this.user)
+    }
+  },
+  methods: {
+    async getUserData() {
+      await axios.get('http://localhost:3000/api/me', {
+        withCredentials: true,
+      })
+      .then((res) => this.user = res.data);
     }
   }
 }

@@ -4,15 +4,31 @@
       <div class="container">
         <div class="row justify-content-end">
           <div class="col-auto align-self-center">
-            {{ user.name }}
+            {{ user.login }}
+          </div>
+          <div class="col-auto align-self-center">
+            <a v-if="user" :href="user.html_url" target="_blank">
+              <div :style="getUserAvatarStyle"></div>
+            </a>
+            <!-- <a href="#">
+              {{ user.login }}
+            </a> -->
           </div>
           <div class="col-auto align-self-center">
             <button
+              v-if="user"
               class="btn btn-log-out"
-              @click="$router.push({ name: 'signIn' })"
+              @click="logOut"
             >
               Log out
               <font-awesome-icon :icon="['fas', 'sign-out-alt']" inverse/>
+            </button>
+            <button
+              v-else
+              class="btn btn-sign-in"
+              @click="$router.push({ name: 'signIn' })"
+            >
+              SignIn
             </button>
           </div>
         </div>
@@ -22,13 +38,27 @@
 </template>
 
 <script>
+// import axios from 'axios'
+
 export default {
   name: 'Header',
+  props: {
+    user: Object
+  },
   data() {
     return {
-      user: {
-        name: 'Haivay',
-      }
+
+    }
+  },
+  computed: {
+    getUserAvatarStyle() {
+      return 'background: url(' + this.user.avatar_url + '); background-size: cover; display:block; width: 38px; height: 38px; border-radius: 38px;';
+    }
+  },
+  methods: {
+    logOut() {
+      this.user = null
+      this.$router.push({ name: 'signIn' })
     }
   }
 }
@@ -42,13 +72,26 @@ export default {
   color: #cccccc;
   padding: 0 30px;
 }
+.user_login {
+  text-decoration: none;
+  color: #e9e9e9
+}
+.btn-sign-in {
+  background: #9a31ca;
+  color: #e9e9e9;
+  /* border: 1px solid #cacaca; */
+}
+.btn-sign-in:hover {
+  background: #b943f0;
+  color: #e9e9e9;
+}
 .btn-log-out {
   background: rgb(39, 38, 43);
-  color: rgb(231, 231, 231);
-  border: 1px solid #cacaca;
+  color: #e9e9e9;
+  /* border: 1px solid #cacaca; */
 }
 .btn-log-out:hover {
   background: rgb(32, 32, 36);
-  color: rgb(231, 231, 231);
+  color: #e9e9e9;
 }
 </style>
