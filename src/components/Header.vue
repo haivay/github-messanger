@@ -3,16 +3,13 @@
     <div class="header__container d-flex align-items-center">
       <div class="container">
         <div class="row justify-content-end">
-          <div class="col-auto align-self-center">
+          <div v-if="user" class="col-auto align-self-center">
             {{ user.login }}
           </div>
           <div class="col-auto align-self-center">
             <a v-if="user" :href="user.html_url" target="_blank">
               <div :style="getUserAvatarStyle"></div>
             </a>
-            <!-- <a href="#">
-              {{ user.login }}
-            </a> -->
           </div>
           <div class="col-auto align-self-center">
             <button
