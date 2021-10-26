@@ -11,14 +11,16 @@
               <div :style="getUserAvatarStyle"></div>
             </a>
           </div>
-          <div class="col-auto align-self-center">
+          <div class="col-auto align-self-center button-log-out">
             <button
               v-if="user"
               class="btn btn-log-out"
               @click="logOut"
             >
-              Log out
-              <font-awesome-icon :icon="['fas', 'sign-out-alt']" inverse/>
+              <div class="log-out-text">
+                Log out
+              </div>
+              <font-awesome-icon class="sign_out_icon" :icon="['fas', 'sign-out-alt']" inverse/>
             </button>
             <button
               v-else
@@ -35,7 +37,6 @@
 </template>
 
 <script>
-// import axios from 'axios'
 
 export default {
   name: 'Header',
@@ -54,7 +55,7 @@ export default {
   },
   methods: {
     logOut() {
-      this.user = null
+      // $this.$emit.
       this.$router.push({ name: 'signIn' })
     }
   }
@@ -68,6 +69,9 @@ export default {
   background: rgb(66, 66, 66);
   color: #cccccc;
   padding: 0 30px;
+}
+.log-out-text {
+  display: inline;
 }
 .user_login {
   text-decoration: none;
@@ -90,5 +94,15 @@ export default {
 .btn-log-out:hover {
   background: rgb(32, 32, 36);
   color: #e9e9e9;
+}
+
+@media screen and (max-width: 767px ) {
+  .log-out-text {
+    display: none;
+  }
+  .header__container {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 </style>

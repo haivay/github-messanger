@@ -1,17 +1,15 @@
 <template>
   <div class="contact">
-    <div class="contact__container">
-      <div class="row">
-        <div class="col-auto">
-          <font-awesome-icon :icon="['fas', 'user-circle']" size="3x" inverse/>
+    <div class="row">
+      <div class="col-auto">
+        <div class="avatar" :style="getUserAvatarStyle"></div>
+      </div>
+      <div class="col">
+        <div class="username">
+          {{ username }}
         </div>
-        <div class="col">
-          <div class="username">
-            {{ username }}
-          </div>
-          <div class="last-message">
-            {{ lastMessage }}
-          </div>
+        <div class="last-message">
+          {{ lastMessage }}
         </div>
       </div>
     </div>
@@ -22,17 +20,23 @@
 export default {
   name: 'Contact',
   props: {
-    id: Number,
+    id: String,
+    avatar: String,
     username: String,
-    lastMessage: String
-  }
+    lastMessage: String,
+  },
+  computed: {
+    getUserAvatarStyle() {
+      return 'background: url(' + this.avatar + '); background-size: cover; display:block; width: 50px; height: 50px; border-radius: 50px;';
+    }
+  },
 }
 </script>
 
 <style scoped>
-.contact__container {
-  padding: 5px;
-}
+/* .contact__container {
+  padding: 2px;
+} */
 .username {
   font-size: 16px;
   color: #e4e4e4;

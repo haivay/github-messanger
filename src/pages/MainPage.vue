@@ -8,17 +8,17 @@
     <div class="container">
       <div class="row">
         <div class="col-sm-12 col-md-5 col-lg-4">
-          <ContactList></ContactList>
+          <ContactList 
+            :user="user"
+          />
         </div>
         <div class="col-sm-0 col-md-7 col-lg-8">
-          <div class="messages">
-            
-            <a 
-              href="#"
-            >
-              {{ user }}
-            </a>
-          </div>
+          <Messages 
+            v-if="user"
+            :id="user.node_id"
+            :avatar="user.avatar_url"
+            :username="user.login"
+          />
         </div>
       </div>
     </div>
@@ -28,13 +28,15 @@
 <script>
 import Header from '../components/Header.vue'
 import ContactList from '../components/ContactList.vue'
+import Messages from '../components/Messages.vue'
 import axios from 'axios'
 
 export default {
   name: 'MainPage',
   components: {
     Header,
-    ContactList
+    ContactList,
+    Messages
   },
   data() {
     return {
@@ -44,7 +46,7 @@ export default {
   async created() {
     if (!this.user) {
       await this.getUserData()
-      console.log(this.user)
+      // console.log(this.user)
     }
   },
   methods: {
@@ -63,11 +65,15 @@ body {
   background: #303133;
   font-family: "Bliss Pro",Helvetica,Arial,sans-serif;
 }
-.messages {
-  width: 100%;
-  height: 100%;
+.form-control {
+  color: #e2e2e2;
   background: #303133;
-  border: 1px solid #6e6f72;
-  border-radius: 6px;
+  border-color: #888888;
+}
+.form-control:focus {
+  color: #e2e2e2;
+  background: #303133;
+  border-color: #888888;
+  box-shadow: none;
 }
 </style>
