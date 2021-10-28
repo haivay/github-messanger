@@ -18,9 +18,9 @@
         @addContact="addContact"
       />
     </div>
-    <div v-if="!searched && contacts" class="contacts">
+    <div v-if="!searched && !searchContactError && contacts" class="contacts">
       <div 
-        class="contact"
+        class="contact-item"
         v-for="(contact, index) of filtredContacts"
         :key="index"
       >
@@ -31,19 +31,27 @@
             :class="checkSelectedContact(index) ? 'selected-contact' : ''"
             aria-current="true"
             @click="selectContact(index)"
+            @mouseover="contactHoverIndex = index" @mouseleave="contactHoverIndex = -1"
           >
-            <Contact 
-              :id="contact.contact.node_id"
-              :avatar="contact.contact.avatar_url"
-              :username="contact.contact.login"
-              :lastMessage="contact.contact.lastMessage"
-            />
+            <div class="row">
+              <div class="col">
+                <Contact 
+                  :id="contact.contact.node_id"
+                  :avatar="contact.contact.avatar_url"
+                  :username="contact.contact.login"
+                  :lastMessage="contact.contact.lastMessage"
+                />    
+              </div>
+              <div class="col-auto">
+                <font-awesome-icon v-if="contactHoverIndex === index" @click="deleteContact(index)" class="user-minus-icon" :icon="['fas', 'user-minus']" size="sm" inverse/>
+              </div>
+            </div>
           </button>
         </div>
       </div>
     </div>
-    <div v-if="filtredContacts === null" class="contacts_empty">
-      Contacts list is empty :(
+    <div v-if="searchContactError" class="contacts_error">
+      {{ searchContactError }}
     </div>
   </div>
 </template>
@@ -72,8 +80,16 @@ export default {
     const selectedContact = null;
     const contacts = useLoadUsers();
     const filtredContacts = null;
+    const searchContactError = null;
+    const contactHoverIndex = -1;
     return {
-      search, searched, selectedContact, contacts, filtredContacts
+      search, 
+      searched, 
+      selectedContact, 
+      contacts, 
+      filtredContacts, 
+      searchContactError, 
+      contactHoverIndex
     }
   },
   watch: {
@@ -94,10 +110,29 @@ export default {
     checkSelectedContact(index) {
       return this.contacts.indexOf(this.selectedContact) == index ? true : false
     },
+    deleteContact(index) {
+      // this.selectedContact = null;
+      // bus.$emit('selectContact', this.selectedContact);
+      console.log(index)
+    },
     searchGitHubUser(login) {
       axios.get(`https://api.github.com/users/${login}`)
       .then((response) => {
+        
         this.searched = response.data
+        this.searchContactError = null;
+      })
+      .catch(err => { 
+        if (err.response) { 
+          // client received an error response (5xx, 4xx)
+          this.searchContactError = 'User not found...'
+        } else if (err.request) { 
+          // client never received a response, or request never left 
+          this.searchContactError = 'Request error :('
+        } else { 
+          // anything else 
+          this.searchContactError = 'Search error!'
+        } 
       })
     },
     async addContact() {
@@ -118,7 +153,8 @@ export default {
 
 <style scoped>
 .list-group-item {
-  background: rgb(77, 77, 77);
+  /* background: rgb(77, 77, 77); */
+  background: #303133;
 }
 .list-group-item:hover {
   background: rgb(87, 87, 87);
@@ -129,7 +165,7 @@ export default {
 .selected-contact {
   background: rgb(119, 119, 119) !important;
 }
-.contacts_empty {
+.contacts_error {
   color: #e4e4e4;
   font-size: 14px;
 }

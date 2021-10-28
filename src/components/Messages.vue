@@ -1,16 +1,28 @@
 <template>
   <div class="messages">
-    <div v-if="contact" class="messages__content mb-2">
+    <div v-if="contact" class="contact_info">
+      {{ contact.login }}
+    </div>
+    <div v-if="contact" ref="messagesContainer" class="messages__content mb-2">
       <div
         v-for="(message, index) in filtredMessages"
         :key="index" 
         class="message"
       >
-        <div class="from">
-          {{ message.from_login }}
-        </div>
-        <div class="content">
-          {{ message.message }}
+        <div class="row">
+          <div class="col-auto">
+            <div class="avatar">
+              <div class="avatar" :style="getMessageAvatarStyle(message, index)"></div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="from" v-if="!checkMessageFromRepeat(index)">
+              {{ message.from_login }}
+            </div>
+            <div class="content">
+              {{ message.message }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -20,7 +32,7 @@
         <div class="select_contact_message">Please select contact</div>
       </div>
     </div>
-    <div class="chat_input">
+    <div v-if="contact" class="chat_input">
       <div class="row">
         <div class="col">
           <input v-model="newMessage" @keydown.enter="sendMessage" type="text" class="form-control" placeholder="Text message...">
@@ -50,10 +62,17 @@ export default {
   setup() {
     const newMessage = null;
     const messages = useLoadMessages();
-    const filtredMessages = null;
+    const filtredMessages = [];
     const contact = null;
+
+    function getMessagesById() {
+      if (this.contact) {
+        return useLoadMessages(this.contact.node_id, this.id)
+      }
+    }
+
     return {
-      newMessage, messages, filtredMessages, contact
+      newMessage, messages, filtredMessages, contact, getMessagesById
     }
   },
   created() {
@@ -64,15 +83,62 @@ export default {
   beforeDestroy() {
     bus.$off('selectContact')
   },
+  // computed: {
+  //   getUserAvatarStyle(message) {
+  //     let avatarUrl = this.checkMessageStyle(message) ? this.avatar : message.avatar_url
+  //     return 'background: url(' + avatarUrl + '); background-size: cover; display:block; width: 50px; height: 50px; border-radius: 50px;';
+  //   }
+  // },
   watch: {
     contact() {
       this.getFiltredMessages()
+      this.scrollToEnd()
     },
     messages() {
       this.getFiltredMessages()
+      this.$forceUpdate()
+    },
+    filtredMessages() {
+      // console.log('fil')
+      // this.scrollToEnd({behavior: 'smooth'});
     }
   },
   methods: {
+    // getMessagesById() {
+    //   if (this.contact) {
+    //     return useLoadMessages(this.contact.node_id, this.id)
+    //   }
+    // },
+    scrollToEnd() {
+      this.$nextTick(() => {
+        const messagesContainer = this.$refs.messagesContainer
+        // console.log(messagesContainer.scrollHeight)
+        messagesContainer.scrollTop = messagesContainer.scrollHeight
+      })
+      
+    },
+    getMessageAvatarStyle(message, index) {
+      if (this.checkMessageFromRepeat(index)) {
+        return 'background-size: cover; display:block; width: 40px;  border-radius: 40px;'
+      } else {
+        return this.checkMessageAvatar(message)
+      }
+    },
+    checkMessageFromRepeat(index) {
+      if (index === 0) {
+        return false
+      }
+
+      if (this.filtredMessages[index].from_id === this.filtredMessages[index-1].from_id) {
+        return true
+      } else {
+        return false 
+      }
+    },
+    checkMessageAvatar(message) {
+      let avatarUrl = message.from_id === this.id ? this.avatar : message.from_avatar
+      return 'background: url(' + avatarUrl + '); background-size: cover; display:block; width: 40px; height: 40px; border-radius: 40px;';
+    },
     getFiltredMessages() {
       if (this.contact) {
         this.filtredMessages = this.messages.filter(el => 
@@ -86,6 +152,7 @@ export default {
         const messageForm = {
           from_id: this.id,
           from_login: this.username,
+          from_avatar: this.avatar,
           to_id: this.contact.node_id,
           message: this.newMessage,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -93,7 +160,6 @@ export default {
         this.newMessage = null
         await addMessage(messageForm)
         this.$forceUpdate()
-        // this.getMessagesForId();
       }
     }
   }
@@ -101,9 +167,12 @@ export default {
 </script>
 
 <style>
-/* .messages {
-  height: 600px;
-} */
+.contact_info {
+  /* width: 100%; */
+  background: rgb(66, 66, 66);
+  height: 50px;
+
+}
 .messages__content {
   overflow: auto;
   width: 100%;
@@ -114,7 +183,6 @@ export default {
 }
 .messages__content::-webkit-scrollbar {
   width: 6px;
-  
   background-color: #303133;
 }
 .messages__content::-webkit-scrollbar-thumb {
@@ -141,11 +209,25 @@ export default {
   margin: 0 auto;
 }
 .message {
-  background: #663F7A;
+  background: #303133;
   border-radius: 6px;
-  color: #ffffff;
-  margin: 2px 40px 2px 10px;
+  font-size: 14.5px;
+  color: #9b9b9b;
+  margin: 4px 10px 4px 10px;
   padding: 6px;
+}
+.message:hover {
+  background: #5b5c5e;
+}
+.content {
+  font-size: 15px;
+  color: #ffffff;
+}
+.not-my-message {
+  /* background: rgb(189, 189, 189); */
+  /* background: #663F7A; */
+  /* margin: 4px 40px 4px 10px; */
+  /* margin: 2px 10px 2px 40px; */
 }
 .btn-send {
   padding-left: 0;

@@ -9,11 +9,11 @@ import { firestorePlugin } from 'vuefire'
 import VueCompositionAPI from '@vue/composition-api'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserCircle, faSignOutAlt, faUserPlus, faUsers, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { faUserCircle, faSignOutAlt, faUserPlus, faUserMinus, faUsers, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faUserCircle, faSignOutAlt, faUserPlus, faUsers, faPaperPlane, faGithub)
+library.add(faUserCircle, faSignOutAlt, faUserPlus, faUserMinus, faUsers, faPaperPlane, faGithub)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 

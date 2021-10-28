@@ -2,8 +2,7 @@
   <div class="contact">
     <div class="row">
       <div class="col-auto">
-        <div class="avatar" :style="getUserAvatarStyle">
-        </div>
+        <div class="avatar" :style="getUserAvatarStyle"></div>
       </div>
       <div class="col">
         <div class="row">

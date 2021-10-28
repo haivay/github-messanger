@@ -25,9 +25,10 @@ export const addUser = user => {
   return usersCollection.add(user)
 }
 
-export const useLoadUsers = (id) => {
+export const useLoadUsers = (contact_id, user_id) => {
   const users = ref([])
-  console.log(id)
+  console.log(contact_id)
+  console.log(user_id)
   const close = usersQuery.onSnapshot(snapshot => {
     users.value = snapshot.docs
       .map(doc => ({ id: doc.id, ...doc.data() }))
@@ -41,7 +42,8 @@ export const addMessage = message => {
   return messagesCollection.add(message)
 }
 
-export const useLoadMessages = () => {
+export const useLoadMessages = (id) => {
+  console.log(id)
   const messages = ref([])
   const close = messagesQuery.onSnapshot(snapshot => {
     messages.value = snapshot.docs
