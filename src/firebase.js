@@ -15,6 +15,29 @@ const firebaseConfig = {
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 const db = firebaseApp.firestore()
 
+export const chatsCollection = db.collection('chats')
+const chatsQuery = chatsCollection.orderBy('createdAt', 'asc')
+
+export const addChat = chat => {
+  return chatsCollection.add(chat)
+}
+
+export const useLoadUserChats = (userID) => {
+  // console.log(`userID:${userID}`)
+  const chats = ref([])
+  const close =  chatsQuery
+    .where('membersIDS', 'array-contains', userID)
+    .onSnapshot(snapshot => {
+      chats.value = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .reverse()
+    })
+    // console.log(chats.value)
+  onUnmounted(close)
+  // console.log(chats.value)
+  return chats;
+}
+
 export const messagesCollection = db.collection('messages')
 const messagesQuery = messagesCollection.orderBy('createdAt', 'desc').limit(100)
 
@@ -25,10 +48,8 @@ export const addUser = user => {
   return usersCollection.add(user)
 }
 
-export const useLoadUsers = (contact_id, user_id) => {
+export const useLoadUsers = () => {
   const users = ref([])
-  console.log(contact_id)
-  console.log(user_id)
   const close = usersQuery.onSnapshot(snapshot => {
     users.value = snapshot.docs
       .map(doc => ({ id: doc.id, ...doc.data() }))
@@ -42,8 +63,8 @@ export const addMessage = message => {
   return messagesCollection.add(message)
 }
 
-export const useLoadMessages = (id) => {
-  console.log(id)
+export const useLoadMessages = () => {
+  // console.log(id)
   const messages = ref([])
   const close = messagesQuery.onSnapshot(snapshot => {
     messages.value = snapshot.docs

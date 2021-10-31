@@ -8,8 +8,10 @@
     <div class="container">
       <div class="row">
         <div class="col-sm-12 col-md-5 col-lg-4">
-          <ContactList 
+          <ContactList
+            v-if="user && chats" 
             :user="user"
+            :chats="chats"
           />
         </div>
         <div class="col-sm-0 col-md-7 col-lg-8">
@@ -26,10 +28,12 @@
 </template>
 
 <script>
+import { onMounted, ref } from '@vue/composition-api'
 import Header from '../components/Header.vue'
 import ContactList from '../components/ContactList.vue'
 import Messages from '../components/Messages.vue'
 import axios from 'axios'
+import { useLoadUserChats } from '@/firebase'
 
 export default {
   name: 'MainPage',
@@ -38,23 +42,29 @@ export default {
     ContactList,
     Messages
   },
-  data() {
-    return {
-      user: null
-    }
-  },
-  async created() {
-    if (!this.user) {
-      await this.getUserData()
-      // console.log(this.user)
-    }
-  },
-  methods: {
-    async getUserData() {
+  setup() {
+    const user = ref(null);
+    const getUserData = async () => {
       await axios.get('http://localhost:3000/api/me', {
-        withCredentials: true,
+        withCredentials: true
       })
-      .then((res) => this.user = res.data);
+      .then(res => {
+        user.value = res.data
+        getUserChats()
+      })
+    }
+    onMounted(getUserData)
+
+    const chats = ref([]);
+    const getUserChats = async () => {
+      chats.value = await useLoadUserChats(user.value.node_id);
+    }
+
+    return {
+      user,
+      getUserData,
+      chats,
+      getUserChats
     }
   }
 }

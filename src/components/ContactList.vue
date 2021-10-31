@@ -15,35 +15,35 @@
         :name="searched.name ? searched.name : ''"
         :username="searched.login"
         :lastMessage="''"
-        @addContact="addContact"
+        @addChat="addChat"
       />
     </div>
-    <div v-if="!searched && !searchContactError && contacts" class="contacts">
+    <div v-if="!searched && !searchContactError && chats.value" class="contacts">
       <div 
         class="contact-item"
-        v-for="(contact, index) of filtredContacts"
+        v-for="(chat, index) of chats.value"
         :key="index"
       >
         <div class="list-group list-group-flush">
           <button 
             type="button" 
             class="list-group-item list-group-item-border list-group-item-action" 
-            :class="checkSelectedContact(index) ? 'selected-contact' : ''"
+            :class="checkSelectedChat(index) ? 'selected-contact' : ''"
             aria-current="true"
-            @click="selectContact(index)"
+            @click="selectChat(index)"
             @mouseover="contactHoverIndex = index" @mouseleave="contactHoverIndex = -1"
           >
             <div class="row">
               <div class="col">
                 <Contact 
-                  :id="contact.contact.node_id"
-                  :avatar="contact.contact.avatar_url"
-                  :username="contact.contact.login"
-                  :lastMessage="contact.contact.lastMessage"
+                  :id="chat.membersIDS.filter(memberID => memberID != user.node_id)[0].node_id"
+                  :avatar="chat.members.filter(member => member.node_id != user.node_id)[0].avatar_url"
+                  :username="chat.members.filter(member => member.node_id != user.node_id)[0].login"
+                  :lastMessage="chat.lastMessage"
                 />    
               </div>
               <div class="col-auto">
-                <font-awesome-icon v-if="contactHoverIndex === index" @click="deleteContact(index)" class="user-minus-icon" :icon="['fas', 'user-minus']" size="sm" inverse/>
+                <font-awesome-icon v-if="contactHoverIndex === index" @click="deleteChat(index)" class="user-minus-icon" :icon="['fas', 'user-minus']" size="sm" inverse/>
               </div>
             </div>
           </button>
@@ -61,7 +61,7 @@ import ContactPreview from './ContactPreview.vue'
 import Contact from './Contact.vue'
 import axios from 'axios'
 import firebase from "firebase/compat/app";
-import { addUser, useLoadUsers } from '@/firebase'
+import { addChat, useLoadUsers } from '@/firebase'
 import 'firebase/firestore'
 import { bus } from '../main'
 
@@ -73,11 +73,12 @@ export default {
   },
   props: {
     user: Object,
+    chats: [Object, Array]
   },
   setup() {
     const search = null;
     const searched = null;
-    const selectedContact = null;
+    const selectedChat = null;
     const contacts = useLoadUsers();
     const filtredContacts = null;
     const searchContactError = null;
@@ -85,7 +86,7 @@ export default {
     return {
       search, 
       searched, 
-      selectedContact, 
+      selectedChat, 
       contacts, 
       filtredContacts, 
       searchContactError, 
@@ -96,25 +97,26 @@ export default {
     search(newValue) {
       this.searched = newValue ? this.searchGitHubUser(newValue) : null
     },
-    contacts(newValue) {
-      if (this.user) {
-        this.filtredContacts = newValue.filter(el => el.id === this.user.node_id)
-      }
-    }
+    // contacts(newValue) {
+    //   if (this.user) {
+    //     this.filtredContacts = newValue.filter(el => el.id === this.user.node_id)
+    //   }
+    // }
   },
   methods: {
-    selectContact(index) {
-      this.selectedContact = this.filtredContacts[index];
-      bus.$emit('selectContact', this.selectedContact);
+    selectChat(index) {
+      this.selectedChat = this.chats.value[index];
+      bus.$emit('selectedChat', this.selectedChat);
     },
-    checkSelectedContact(index) {
-      return this.contacts.indexOf(this.selectedContact) == index ? true : false
+    checkSelectedChat(index) {
+      return this.chats.value.indexOf(this.selectedChat) == index ? true : false
     },
-    deleteContact(index) {
+    deleteChat(index) {
       // this.selectedContact = null;
-      // bus.$emit('selectContact', this.selectedContact);
+      // bus.$emit('selectChat', this.selectedContact);
       console.log(index)
     },
+
     searchGitHubUser(login) {
       axios.get(`https://api.github.com/users/${login}`)
       .then((response) => {
@@ -135,16 +137,17 @@ export default {
         } 
       })
     },
-    async addContact() {
+    async addChat() {
       if (this.searched != null) {
-        const contactForm = {
-          id: this.user.node_id,
-          contact: this.searched,
-          addedAt: firebase.firestore.FieldValue.serverTimestamp()
+        const chatForm = {
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          membersIDS: [this.user.node_id, this.searched.node_id],
+          members: [this.user, this.searched],
+          lastMessage: ''
         }
         this.search = null
         this.searched = null
-        await addUser(contactForm)
+        await addChat(chatForm)
       }
     }
   }

@@ -10,7 +10,7 @@
             {{ username }}
           </div>
           <div class="col-auto">
-            <a class="btn-add" @click="addContact">
+            <a class="btn-add" @click="addChat">
               <font-awesome-icon class="user-plus-icon" :icon="['fas', 'user-plus']" inverse/>
             </a>
           </div>
@@ -39,8 +39,8 @@ export default {
     }
   },
   methods: {
-    addContact() {
-      this.$emit('addContact')
+    addChat() {
+      this.$emit('addChat')
     }
   }
 }

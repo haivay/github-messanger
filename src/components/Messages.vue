@@ -72,16 +72,20 @@ export default {
     }
 
     return {
-      newMessage, messages, filtredMessages, contact, getMessagesById
+      newMessage, 
+      messages, 
+      filtredMessages, 
+      contact, 
+      getMessagesById
     }
   },
   created() {
-    bus.$on('selectContact', data => {
-      this.contact = data.contact;
+    bus.$on('selectedChat', data => {
+      this.contact = data;
     })
   },
   beforeDestroy() {
-    bus.$off('selectContact')
+    bus.$off('selectedChat')
   },
   // computed: {
   //   getUserAvatarStyle(message) {
@@ -178,7 +182,7 @@ export default {
   width: 100%;
   height: 500px;
   background: #303133;
-  /* border: 1px solid #6e6f72; */
+  border: 1px solid #6e6f72;
   border-radius: 0.25rem;
 }
 .messages__content::-webkit-scrollbar {
